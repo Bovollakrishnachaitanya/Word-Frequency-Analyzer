@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Word Frequency Analyzer</title>
+
+    <!-- Google Fonts for a modern look -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- Simple and elegant CSS -->
+    <style>
+      body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f4f7fc;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        color: #333;
+      }
+
+      h1 {
+        font-family: 'Roboto', sans-serif;
+        color: #2c3e50;
+        margin-bottom: 30px;
+        font-size: 36px;
+        font-weight: 700;
+      }
+
+      .container {
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: 40px;
+        width: 80%;
+        max-width: 600px;
+        text-align: center;
+        transition: transform 0.3s ease;
+      }
+
+      .container:hover {
+        transform: translateY(-5px);
+      }
+
+      input[type="text"] {
+        width: 80%;
+        padding: 12px 15px;
+        margin: 15px 0;
+        border: 2px solid #3498db;
+        border-radius: 8px;
+        font-size: 16px;
+        outline: none;
+        transition: border-color 0.3s ease;
+      }
+
+      input[type="text"]:focus {
+        border-color: #2980b9;
+      }
+
+      button {
+        padding: 12px 25px;
+        background-color: #3498db;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #2980b9;
+      }
+
+      table {
+        width: 100%;
+        margin-top: 20px;
+        border-collapse: collapse;
+      }
+
+      th, td {
+        padding: 12px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #3498db;
+        color: #fff;
+        font-weight: bold;
+      }
+
+      tbody tr:hover {
+        background-color: #f1f1f1;
+      }
+
+      .error-message {
+        color: #e74c3c;
+        font-size: 18px;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Word Frequency Analyzer</h1>
+      <input
+        type="text"
+        id="url-input"
+        placeholder="Enter a URL"
+        aria-label="URL Input"
+      />
+      <button onclick="fetchWordFrequencies()">Fetch Word Frequencies</button>
+
+      <div id="error-message" class="error-message"></div>
+
+      <table id="word-frequencies-table" style="display: none;">
+        <thead>
+          <tr>
+            <th>Word</th>
+            <th>Frequency</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <script>
+      async function fetchWordFrequencies() {
+        const url = document.getElementById('url-input').value;
+        const errorMessage = document.getElementById('error-message');
+        const table = document.getElementById('word-frequencies-table');
+        const tbody = table.querySelector('tbody');
+
+        // Clear previous error and table data
+        errorMessage.textContent = '';
+        tbody.innerHTML = '';
+
+        if (!url) {
+          errorMessage.textContent = 'Please enter a valid URL.';
+          return;
+        }
+
+        try {
+          const response = await fetch('http://127.0.0.1:5000/fetch-word-frequency', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ url }),
+          });
+
+          if (!response.ok) {
+            throw new Error('Error fetching data from the server.');
+          }
+
+          const data = await response.json();
+
+          if (data.error) {
+            errorMessage.textContent = data.error;
+            table.style.display = 'none';
+          } else {
+            table.style.display = 'block';
+            data.forEach(item => {
+              const row = document.createElement('tr');
+              row.innerHTML = `<td>${item.word}</td><td>${item.frequency}</td>`;
+              tbody.appendChild(row);
+            });
+          }
+        } catch (err) {
+          errorMessage.textContent = err.message;
+          table.style.display = 'none';
+        }
+      }
+    </script>
+  </body>
+</html>

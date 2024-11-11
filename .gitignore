@@ -1,0 +1,30 @@
+# Node modules
+/frontend/node_modules/
+
+# Python Bytecode
+/backend/__pycache__/
+
+# Flask specific
+/backend/instance/
+
+# Virtual Environment
+/backend/venv/
+.backend/.env
+
+# React build folder
+/frontend/build/
+
+# Logs
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Environment variable files
+.env
+
+# IDE/editor files (optional)
+.idea/
+.vscode/
+
